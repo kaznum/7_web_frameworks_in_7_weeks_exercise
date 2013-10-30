@@ -33,3 +33,19 @@ get "/bookmarks/:id" do
   content_type :json
   bookmark.to_json
 end
+
+put "/bookmarks/:id" do
+  id = params[:id]
+  bookmark = Bookmark.get(id)
+  input = params.slice "url", "title"
+  bookmark.update input
+  204 # No Content
+end
+
+
+delete "/bookmarks/:id" do
+  id = params[:id]
+  bookmark = Bookmark.get(id)
+  bookmark.destroy
+  200
+end
