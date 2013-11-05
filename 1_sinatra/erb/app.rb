@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'data_mapper'
 require 'dm-serializer'
+require 'sinatra/respond_with'
 require_relative 'bookmark'
 
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/bookmarks.db")
@@ -16,8 +17,8 @@ get "/" do
 end
 
 get "/bookmarks" do
-  content_type :json
-  get_all_bookmarks.to_json
+  @bookmark = get_all_bookmarks
+  respond_with :bookmark_list, @bookmarks
 end
 
 post "/bookmarks" do
