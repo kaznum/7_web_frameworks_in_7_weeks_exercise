@@ -60,7 +60,7 @@ get "/bookmark/new" do
   erb :bookmark_form_new
 end
 
-helper do
+helpers do
   def h(text)
     Rack::Utils.escape_html(text)
   end
