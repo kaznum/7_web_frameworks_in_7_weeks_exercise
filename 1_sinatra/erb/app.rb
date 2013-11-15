@@ -17,7 +17,7 @@ get "/" do
 end
 
 get "/bookmarks" do
-  @bookmark = get_all_bookmarks
+  @bookmarks = get_all_bookmarks
   respond_with :bookmark_list, @bookmarks
 end
 
