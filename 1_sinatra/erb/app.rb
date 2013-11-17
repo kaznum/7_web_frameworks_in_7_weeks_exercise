@@ -35,9 +35,8 @@ end
 
 get "/bookmarks/:id" do
   id = params[:id]
-  bookmark = Bookmark.get(id)
-  content_type :json
-  bookmark.to_json
+  @bookmark = Bookmark.get(id)
+  respond_with :bookmark_form_edit, @bookmark
 end
 
 put "/bookmarks/:id" do
