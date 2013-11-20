@@ -39,7 +39,7 @@ describe "Bookmark application" do
 
     header "Accept", "application/json"
     post "/bookmarks/#{id}", { url: "http://www.test2.com", title: "Success" }
-    last_response.status.should == 204
+    last_response.status.should == 200
 
     header "Accept", "application/json"
     get "/bookmarks/#{id}"
