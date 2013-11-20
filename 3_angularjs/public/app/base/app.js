@@ -8,12 +8,13 @@
     return Bookmark.query();
   });
 
-  app.factory("saveBookmark", function(bookmarks) {
+  app.factory("saveBookmark", function(bookmarks, state) {
     return function (bookmark) {
       if (!bookmark.id) {
         bookmarks.push(bookmark);
       }
       bookmark.$save();
+      state.clearForm();
     };
   });
 
@@ -43,6 +44,13 @@
       state.formBookmark.bookmark = bookmark;
     };
   });
+
+  app.controller("BookmarkFormController", function ($scope, state, bookmarks, saveBookmark) {
+    $scope.formBookmark = state.formBookmark;
+    $scope.saveBookmark = saveBookmark;
+    $scope.clearForm = state.clearForm;
+  });
+
 })(
   angular.module("App_base", ["ngResource"])
 );
