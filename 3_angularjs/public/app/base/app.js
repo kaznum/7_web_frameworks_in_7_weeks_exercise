@@ -30,6 +30,19 @@
     $scope.deleteBookmark = deleteBookmark;
     $scope.editBookmark = editBookmark;
   });
+
+  app.service("state", function (Bookmark) {
+    this.formBookmark = {bookmark:new Bookmark()};
+    this.clearForm = function() {
+      this.formBookmark.bookmark = new Bookmark();
+    };
+  });
+
+  app.factory("editBookmark", function(state) {
+    return function(bookmark) {
+      state.formBookmark.bookmark = bookmark;
+    };
+  });
 })(
   angular.module("App_base", ["ngResource"])
 );
