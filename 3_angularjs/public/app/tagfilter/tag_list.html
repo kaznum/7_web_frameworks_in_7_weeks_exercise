@@ -1,5 +1,5 @@
 Tags:
-<ul>
+<ul ng-controller="TagListController">
   <li ng-repeat="tag in tags">
     <a href="#" ng-click="filterBy(tag)">{{tag.label}} ({{tag.bookmarkCount}})</a>
   </li>
