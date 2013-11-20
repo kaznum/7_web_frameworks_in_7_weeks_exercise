@@ -1,4 +1,4 @@
 1_sinatra/**/.ruby-version
 1_sinatra/**/.ruby-gemset
 1_sinatra/**/*.db
-
+3_angularjs/**/*.db
