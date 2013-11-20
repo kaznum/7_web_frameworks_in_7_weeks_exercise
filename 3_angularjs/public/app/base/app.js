@@ -25,6 +25,11 @@
     };
   });
 
+  app.controller("BookmarkListController", function ($scope, bookmarks, deleteBookmark, editBookmark) {
+    $scope.bookmarks = bookmarks;
+    $scope.deleteBookmark = deleteBookmark;
+    $scope.editBookmark = editBookmark;
+  });
 })(
   angular.module("App_base", ["ngResource"])
 );
