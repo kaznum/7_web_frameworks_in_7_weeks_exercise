@@ -1,0 +1,16 @@
+Bookmark:
+<form ng-submit="saveBookmark(formBookmark.bookmark)" ng-controller="BookmarkFormController">
+  <label>
+    URL: <input type="text" ng-model="formBookmark.bookmark.url" name="url">
+  </label>
+  <label>
+    Title: <input type="text" ng-model="formBookmark.bookmark.title" name="title">
+  </label>
+  <label>
+    Tags: (separated by commas)
+    <input type="text" ng-model="formBookmark.bookmark.tagList" ng-list name="tagList">
+  </label>
+  <input type="submit" class="btn btn-primary" value="Save">
+  <input type="button" class="btn" ng-click="clearForm()" value="Clear">
+</form>
+
