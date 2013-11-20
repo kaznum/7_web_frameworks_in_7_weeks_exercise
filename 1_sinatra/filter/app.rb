@@ -8,13 +8,6 @@ require_relative 'bookmark'
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/bookmarks.db")
 DataMapper::finalize.auto_upgrade!
 
-before "/bookmarks/:id" do |id|
-  @bookmark = Bookmark.get(id)
-  if !@bookmark
-    halt 404, "bookmark #{id} not found"
-  end
-end
-
 def get_all_bookmarks
   Bookmark.all(order: :title)
 end
@@ -55,11 +48,17 @@ get "/test/:one/:two" do |creature, sound|
 end
 
 put "/bookmarks/:id" do
-  input = params.slice "url", "title"
-  if bookmark.update input
-    204 # No Content
+  id = params[:id]
+  bookmark = Bookmark.get(id)
+  if bookmark
+    input = params.slice "url", "title"
+    if bookmark.update input
+      204 # No Content
+    else
+      400 # bad request
+    end
   else
-    400 # bad request
+    [404, "bookmark #{id} not found"]
   end
 end
 
