@@ -17,7 +17,10 @@ describe "Bookmark application" do
 
     post "/bookmarks", { url: "http://www.test.com", title: "Test" }
     last_response.status.should == 201
-    last_response.body.should match (/\/bookmarks\/\d+/)
+
+    created = JSON.parse(last_response.body)
+    created["url"].should == "http://www.test.com"
+    created["title"].should == "Test"
 
     get "bookmarks"
     bookmarks = JSON.parse(last_response.body)
@@ -32,11 +35,10 @@ describe "Bookmark application" do
   it "updates a bookmark" do
     header "Accept", "application/json"
     post '/bookmarks', { url: "http://www.test.com", title: "Test" }
-    bookmark_url = last_response.body
-    id = bookmark_url.split("/").last
+    id = JSON.parse(last_response.body)["id"]
 
     header "Accept", "application/json"
-    put "/bookmarks/#{id}", { url: "http://www.test2.com", title: "Success" }
+    post "/bookmarks/#{id}", { url: "http://www.test2.com", title: "Success" }
     last_response.status.should == 204
 
     header "Accept", "application/json"
@@ -52,15 +54,14 @@ describe "Bookmark application" do
     bookmarks = JSON.parse(last_response.body)
     id = bookmarks.first['id']
 
-    put "/bookmarks/#{id}", {url: "Invalid" }
+    post "/bookmarks/#{id}", {url: "Invalid" }
     last_response.status.should == 400
   end
 
   it "deletes a bookmark" do
     header "Accept", "application/json"
     post '/bookmarks', { url: "http://www.test.com", title: "Test" }
-    bookmark_url = last_response.body
-    id = bookmark_url.split("/").last
+    id = JSON.parse(last_response.body)["id"]
 
     header "Accept", "application/json"
     get '/bookmarks'

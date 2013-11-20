@@ -1,4 +1,5 @@
-<form ng-submit="saveBookmark(formBookmark.bookmark)">
+Bookmark:
+<form ng-submit="saveBookmark(formBookmark.bookmark)" ng-controller="BookmarkFormController">
   <label>
     URL: <input type="text" ng-model="formBookmark.bookmark.url" name="url">
   </label>

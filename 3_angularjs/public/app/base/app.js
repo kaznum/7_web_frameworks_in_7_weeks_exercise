@@ -9,12 +9,14 @@
   });
 
   app.factory("saveBookmark", function(bookmarks, state) {
-    return function (bookmark) {
-      if (!bookmark.id) {
-        bookmarks.push(bookmark);
-      }
-      bookmark.$save();
-      state.clearForm();
+    return function(bookmark) {
+      var isNew = !!!bookmark.id;
+      bookmark.$save(function() {
+        if (isNew) {
+          bookmarks.push(bookmark);
+        }
+        state.clearForm();
+      });
     };
   });
 
@@ -33,7 +35,7 @@
   });
 
   app.service("state", function (Bookmark) {
-    this.formBookmark = {bookmark:new Bookmark()};
+    this.formBookmark = {bookmark: new Bookmark()};
     this.clearForm = function() {
       this.formBookmark.bookmark = new Bookmark();
     };

@@ -1,15 +1,17 @@
 doctype html
-html lang="en"
+html lang="en" ng-app="App_base"
   head
     meta charset="utf-8"
     title Bookmarking App
     link href="/css/bootstrap.min.css" rel="stylesheet"
-    link href="/css/app.css" rel="stylesheet"
   body
     .container
-      h1 Bookmarking App
-      hr
-      div
-        == yield
+      .row
+        .span12
+          h1 Bookmarking App
+          hr
+          .row
+            #{{IO.read("views/base.html")}}
     script src="/lib/angularjs/1.2.1/angular.js"
     script src="/lib/angularjs/1.2.1/angular-resource.js"
+    script src="/app/base/app.js"

@@ -6,12 +6,13 @@ require 'slim'
 require_relative 'bookmark'
 require_relative 'tagging'
 require_relative 'tag'
+require 'json'
 
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/bookmarks.db")
 DataMapper::finalize.auto_upgrade!
 
 before %r{/bookmarks/(\d+)} do |id|
-  @bookmark = Bookmark.get(id)
+  @bookmark = Bookmark.get(id.to_i)
   if !@bookmark
     halt 404, "bookmark #{id} not found"
   end
@@ -23,7 +24,7 @@ end
 
 get "/" do
   @bookmarks = get_all_bookmarks
-  slim :bookmark_list
+  slim :index
 end
 
 get "/bookmarks" do
@@ -33,11 +34,16 @@ end
 
 
 post "/bookmarks" do
-  input = params.slice "url", "title"
+  if params.empty?
+    input = JSON.parse(request.body.read).slice("url", "title")
+  else
+    input = params.slice "url", "title"
+  end
+
   bookmark = Bookmark.new input
   if bookmark.save
     add_tags(bookmark)
-    [201, "/bookmarks/#{bookmark['id']}"]
+    [201, bookmark.to_json]
   else
     400 #bad request
   end
@@ -70,8 +76,12 @@ get "/test/:one/:two" do |creature, sound|
   "a #{creature} says #{sound}"
 end
 
-put %r{/bookmarks/\d+} do
+post %r{/bookmarks/\d+} do
+  if params.empty?
+    input = JSON.parse(request.body.read).slice("url", "title")
+  else
   input = params.slice "url", "title"
+  end
   if @bookmark.update input
     204 # No Content
   else
