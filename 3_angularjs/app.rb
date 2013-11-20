@@ -18,6 +18,8 @@ before %r{/bookmarks/(\d+)} do |id|
   end
 end
 
+with_tagList = {methods: [:tagList]}
+
 def get_all_bookmarks
   Bookmark.all(order: :title)
 end
@@ -28,34 +30,28 @@ get "/" do
 end
 
 get "/bookmarks" do
-  @bookmarks = get_all_bookmarks
-  respond_with :bookmark_list, @bookmarks
+  content_type :json
+  get_all_bookmarks.to_json with_tagList
 end
 
 
 post "/bookmarks" do
-  if params.empty?
-    input = JSON.parse(request.body.read).slice("url", "title")
-  else
-    input = params.slice "url", "title"
-  end
+  input = params.empty? ? JSON.parse(request.body.read) : params
 
-  bookmark = Bookmark.new input
+  bookmark = Bookmark.new input.only("url", "title")
   if bookmark.save
-    add_tags(bookmark)
-    [201, bookmark.to_json]
+    add_tags(bookmark, input)
+    [201, bookmark.to_json(with_tagList)]
   else
     400 #bad request
   end
 end
 
 class Hash
-  def slice(*whitelist)
+  def only(*whitelist)
     whitelist.inject({}) { |result, key| result.merge(key => self[key])}
   end
 end
-
-with_tagList = {methods: [:tagList]}
 
 get %r{/bookmarks/\d+} do
   content_type :json
@@ -77,13 +73,11 @@ get "/test/:one/:two" do |creature, sound|
 end
 
 post %r{/bookmarks/\d+} do
-  if params.empty?
-    input = JSON.parse(request.body.read).slice("url", "title")
-  else
-  input = params.slice "url", "title"
-  end
-  if @bookmark.update input
-    204 # No Content
+  input = params.empty? ? JSON.parse(request.body.read) : params
+
+  if @bookmark.update input.only("url", "title")
+    add_tags(@bookmark, input)
+    200 #OK
   else
     400 # bad request
   end
@@ -104,8 +98,8 @@ helpers do
     Rack::Utils.escape_html(text)
   end
 
-  def add_tags(bookmark)
-    labels = (params["tagsAsString"] || '').split(',').map(&:strip)
+  def add_tags(bookmark, input)
+    labels = input["tagList"].is_a?(String) ? input["tagList"].split(',').map(&:strip) : (input["tagList"] || []).map(&:strip)
 
     existing_labels = []
     bookmark.taggings.each do |tagging|

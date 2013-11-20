@@ -1,5 +1,5 @@
 doctype html
-html lang="en" ng-app="App_base"
+html lang="en" ng-app="App_tagfilter"
   head
     meta charset="utf-8"
     title Bookmarking App
@@ -11,7 +11,9 @@ html lang="en" ng-app="App_base"
           h1 Bookmarking App
           hr
           .row
-            #{{IO.read("views/base.html")}}
+            #{{IO.read("views/tagfilter.html")}}
+    script src="/lib/sugar.min.js"
     script src="/lib/angularjs/1.2.1/angular.js"
     script src="/lib/angularjs/1.2.1/angular-resource.js"
     script src="/app/base/app.js"
+    script src="/app/tagfilter/app.js"
