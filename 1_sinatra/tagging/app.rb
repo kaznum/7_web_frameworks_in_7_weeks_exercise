@@ -10,7 +10,7 @@ require_relative 'tag'
 DataMapper::setup(:default, "sqlite3://#{Dir.pwd}/bookmarks.db")
 DataMapper::finalize.auto_upgrade!
 
-before "/bookmarks/:id" do |id|
+before %r{/bookmarks/(\d+)} do |id|
   @bookmark = Bookmark.get(id)
   if !@bookmark
     halt 404, "bookmark #{id} not found"
@@ -31,10 +31,12 @@ get "/bookmarks" do
   respond_with :bookmark_list, @bookmarks
 end
 
+
 post "/bookmarks" do
   input = params.slice "url", "title"
   bookmark = Bookmark.new input
   if bookmark.save
+    add_tags(bookmark)
     [201, "/bookmarks/#{bookmark['id']}"]
   else
     400 #bad request
@@ -47,16 +49,28 @@ class Hash
   end
 end
 
-get "/bookmarks/:id" do |id|
-  @bookmark = Bookmark.get(id)
-  respond_with :bookmark_form_edit, @bookmark
+with_tagList = {methods: [:tagList]}
+
+get %r{/bookmarks/\d+} do
+  content_type :json
+  @bookmark.to_json with_tagList
+end
+
+
+get "/bookmarks/*" do
+  tags = params[:splat].first.split '/'
+  bookmarks = Bookmark.all
+  tags.each do |tag|
+    bookmarks = bookmarks.all({ taggings: { tag: { label: tag }}})
+  end
+  bookmarks.to_json with_tagList
 end
 
 get "/test/:one/:two" do |creature, sound|
   "a #{creature} says #{sound}"
 end
 
-put "/bookmarks/:id" do
+put %r{/bookmarks/\d+} do
   input = params.slice "url", "title"
   if @bookmark.update input
     204 # No Content
@@ -66,10 +80,8 @@ put "/bookmarks/:id" do
 end
 
 
-delete "/bookmarks/:id" do
-  id = params[:id]
-  bookmark = Bookmark.get(id)
-  bookmark.destroy
+delete %r{/bookmarks/\d+} do
+  @bookmark.destroy
   200
 end
 
@@ -81,4 +93,27 @@ helpers do
   def h(text)
     Rack::Utils.escape_html(text)
   end
+
+  def add_tags(bookmark)
+    labels = (params["tagsAsString"] || '').split(',').map(&:strip)
+
+    existing_labels = []
+    bookmark.taggings.each do |tagging|
+      if labels.include? tagging.tag.label
+        existing_labels.push tagging.tag.label
+      else
+        tagging.destroy
+      end
+    end
+
+    (labels - existing_labels).each do |label|
+      tag = { label: label }
+      existing = Tag.first tag
+      if !existing
+        existing = Tag.create tag
+      end
+      Tagging.create tag: existing, bookmark: bookmark
+    end
+  end
 end
+
