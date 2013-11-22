@@ -7,3 +7,4 @@
 / HomeR GET
 
 /direct DirectR GET
+/secret SecretR GET
