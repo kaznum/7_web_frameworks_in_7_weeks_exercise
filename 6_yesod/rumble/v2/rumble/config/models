@@ -1,0 +1,22 @@
+User
+    ident Text
+    password Text Maybe
+    UniqueUser ident
+    deriving Typeable Show
+
+Post
+    title String
+    url String
+    author UserId
+    score Int default=0
+    created UTCTime default=now
+    deriving Typeable Show
+
+Comment
+    post PostId
+    author UserId
+    created UTCTime default=now
+    body Text
+    deriving Typeable Show
+
+ -- By default this file is used in Model.hs (which is imported by Foundation.hs)
