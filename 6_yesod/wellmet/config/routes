@@ -6,3 +6,4 @@
 
 / HomeR GET POST
 /greet/#Text GreetR GET
+/greet2/#Text Greet2R GET
