@@ -12,13 +12,18 @@ import Import
 -- inclined, or create a single monolithic file.
 getHomeR :: Handler Html
 getHomeR = do
-    (formWidget, formEnctype) <- generateFormPost sampleForm
-    let submission = Nothing :: Maybe (FileInfo, Text)
-        handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+  posts <- runDB $ selectList [] [Desc PostScore]
+  defaultLayout $ do
+    setTitle "Rumble"
+    $(widgetFile "home")
+
+generatePostWidget :: Entity Post -> Widget
+generatePostWidget (Entity postId post) = do
+  (author, comments) <- handlerToWidget $ runDB $ do
+    comments <- selectList [CommentPost ==. postId] [Asc CommentCreated]
+    author <- get404 $ postAuthor post
+    return (author, comments)
+  $(widgetFile "post")
 
 postHomeR :: Handler Html
 postHomeR = do
