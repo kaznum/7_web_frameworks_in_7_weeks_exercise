@@ -74,6 +74,8 @@ instance Yesod App where
                 , css_bootstrap_css
                 ])
             $(widgetFile "default-layout")
+
+        authLinkContent <- widgetToPageContent authLinkWidget
         giveUrlRenderer $(hamletFile "templates/default-layout-wrapper.hamlet")
 
     -- This is done to provide an optimization for serving static files from
@@ -149,3 +151,8 @@ getExtra = fmap (appExtra . settings) getYesod
 -- wiki:
 --
 -- https://github.com/yesodweb/yesod/wiki/Sending-email
+authLinkWidget :: Widget
+authLinkWidget = do
+  onclick <- createOnClick def AuthR
+  loginIcon <- return $ PluginR "browserid" ["static", "sign-in.png"]
+  [whamlet|<a href="javascript:#{onclick}()"><img src=@{AuthR loginIcon}></a>|]
