@@ -21,6 +21,9 @@ library
                      Settings.Development
                      Handler.Home
                      Handler.Users
+                     Handler.Post
+                     Handler.PostNew
+                     Handler.Comments
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

@@ -6,3 +6,6 @@
 
 / HomeR GET POST
 /users UsersR GET POST
+/post/#PostId PostR GET
+/new PostNewR GET POST
+/post/#PostId/comments CommentsR POST
