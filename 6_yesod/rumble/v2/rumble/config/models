@@ -5,8 +5,8 @@ User
     deriving Typeable Show
 
 Post
-    title String
-    url String
+    title Text
+    url Text
     author UserId
     score Int default=0
     created UTCTime default=now
