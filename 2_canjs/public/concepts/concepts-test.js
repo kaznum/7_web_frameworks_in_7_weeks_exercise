@@ -126,4 +126,8 @@ new MyControl("#bookmark_continer", options);
 // var element = $("#bookmark_container");
 // new MyControl(element, options);
 
+location.hash = "#!action=filter";
+can.route.attr("action");
+can.route.attr("tag", "Frameworks");
+location.hash; // return "#!&action=filter&tag=Frameworks"
 
