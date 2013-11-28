@@ -104,3 +104,18 @@ observe.push(48);
 observe.splice(1,2);
 
 
+var MyControl = can.Control.extend({
+  init: function (element, options) {
+    var view = "/concepts/bookmarks";
+    element.html(view, {bookmarks:options.bookmarks});
+  }
+});
+
+var bookmarks = [];
+var options = {bookmarks: bookmarks};
+new MyControl("#bookmark_continer", options);
+// The followings works well, too...
+// var element = $("#bookmark_container");
+// new MyControl(element, options);
+
+
