@@ -74,3 +74,33 @@ var ExampleStatic = can.Construct.extend({
 }, {
 });
 
+// Create an observe
+var observe = new can.Observe({});
+observe.bind("title", function(evt, newTitle, oldTitle) {
+  console.log("title: newTitle=", newTitle, "oldTitle=", oldTitle);
+});
+
+observe.attr("title", "First");
+observe.attr("title", "Second");
+
+// Only to read
+observe.attr("title");
+
+observe.bind("change", function(evt, attr, how, newValue, oldValue) {
+  console.log("change: attr=", attr, "how=", how, "newValue=", newValue, "oldValue=", oldValue);
+});
+
+observe.attr("title", "Third");
+observe.removeAttr("title");
+
+var observe = new can.Observe.List([42,44,46]);
+observe.bind("add", function(evt, newValues, index) {
+  console.log("add: newValues=", newValues, "index=", index);
+});
+observe.bind("remove", function(evt, oldValues, index) {
+  console.log("remove: oldValues=", oldValues, "index=", index);
+});
+observe.push(48);
+observe.splice(1,2);
+
+
