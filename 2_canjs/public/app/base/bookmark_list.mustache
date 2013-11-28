@@ -1,6 +1,6 @@
 <ul>
   {{#bookmarks}}
-    <li {{data: "bookmark"}}>
+    <li {{data "bookmark"}}>
       <button class="edit">Edit</button>
       <button class="delete">Delete</button>
       <a href="{{url}}">{{title}}</a>
@@ -8,4 +8,3 @@
     </li>
   {{/bookmarks}}
 </ul>
-
