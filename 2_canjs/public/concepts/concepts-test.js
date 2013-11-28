@@ -108,7 +108,15 @@ var MyControl = can.Control.extend({
   init: function (element, options) {
     var view = "/concepts/bookmarks";
     element.html(view, {bookmarks:options.bookmarks});
-  }
+  },
+
+  "button click": function (el, evt) {
+    //...
+  },
+
+  ".item :checkbox change": function (el. evt) {
+    //...
+  },
 });
 
 var bookmarks = [];
