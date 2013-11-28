@@ -21,7 +21,29 @@ var TaggedBookmark = ValidatingBookmark.extend({
     tagList.attr(notEmpty.sort(), true);
   }
 });
+TaggedBookmark.List = ValidatingBookmark.List.extend({
+  tags: function () {
+    var bookmarkCounts = {};
 
+    this.each(function(bookmark) {
+      var tagList = bookmark.attr("tagList");
+
+      if(tagList) {
+        tagList.each(function(tag) {
+          var existing = bookmarkCounts[tag];
+          bookmarkCounts[tag] = existing ? existing + 1 : 1;
+        });
+      }
+    });
+
+    var labels = Object.keys(bookmarkCounts);
+    labels.sort();
+
+    return can.map(labels, function(label) {
+      return { label: label, bookmarkCount: bookmarkCounts[label] };
+    });
+  }
+});
 var TaggedBookmarkListControl = BookmarkListControl.extend({
   view: "/app/tagfilter/bookmark_list"
 });
@@ -31,16 +53,71 @@ var TaggedBookmarkFormControl = ValidatingBookmarkFormControl.extend({
   view: "/app/tagfilter/bookmark_form"
 });
 
-var App_base = can.Construct.extend({
-  init: function() {
-    ValidatingBookmark.findAll({}, function(bookmarks) {
-      var eventHub = new can.Observe({});
-      var options = {eventHub: eventHub, bookmarks: bookmarks};
+var filterObject = new can.Observe({
+  filterTag: "" // initially blank
+});
 
-      new TaggedBookmarkListControl("#bookmark_list_container", options);
+var filterFunction = function(bookmark) {
+  var tagList = bookmark.attr("tagList");
+  var filterTag = filterObject.attr("filterTag");
+  var noFilter = (!filterTag) || (filterTag.length == 0);
+  var tagListContainsFilterTag = tagList && tagList.indexOf(filterTag) > -1;
+  return noFilter || tagListContainsFilterTag;
+};
+
+
+var TagFilterBookmarkListControl =  TaggedBookmarkListControl.extend({
+  "a.tag click": function(el, evt) {
+    var tag = String(el.data("tag"));
+    this.options.filterObject.attr("filterTag", tag);
+  }
+});
+
+var TagFilterControl = can.Control.extend({
+  defaults: {
+    view: "/app/tagfilter/tag_filter"
+  }
+}, {
+  init: function(element, options) {
+    this.element.html(options.view, options.filterObject);
+  },
+  "a.clear click": function(el, evt) {
+    this.options.filterObject.attr("filterTag", "");
+  }
+});
+
+var TagListControl = can.Control.extend({
+  defaults: {
+    view: "/app/tagfilter/tag_list"
+  }
+}, {
+  init: function (element, options) {
+    this.eventHub = options.eventHub;
+    var model = { bookmarks: options.bookmarks };
+    element.html(options.view, model);
+  },
+  "a.tag click": function(el, evt) {
+    var tag = el.data("tag");
+    this.options.filterObject.attr("filterTag", tag.label);
+  }
+});
+
+var App_tagfilter = can.Construct.extend({
+  init: function() {
+    TaggedBookmark.findAll({}, function(bookmarks) {
+      var eventHub = new can.Observe({});
+      var options = { eventHub: eventHub, bookmarks:bookmarks, filterObject: filterObject };
+
+      var filtered = bookmarks.filter(filterFunction);
+
+      // The options object with the filtered bookmark list
+      var filteredOptions = can.extend({}, options, {bookmarks: filtered});
+
+      new TagFilterBookmarkListControl("#bookmark_list_container", filteredOptions);
+      new TagFilterControl("#filter_container", options);
+      new TagListControl("#tag_list_container", options);
       new TaggedBookmarkFormControl("#bookmark_form_container", options);
     });
   }
 });
-
 
