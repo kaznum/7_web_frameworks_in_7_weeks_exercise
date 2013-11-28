@@ -14,3 +14,10 @@ Bookmark.findAll({}, function(bookmarks) {
 Bookmark.findOne({id:42}, function(bookmark) {
 });
 
+getBookmark: function (el) {
+  return el.closest("li").data("bookmark");
+},
+".delete click": function(el, evt) {
+  this.getBookmark(el).destroy();
+},
+
